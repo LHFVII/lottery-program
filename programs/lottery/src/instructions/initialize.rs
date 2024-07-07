@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface};
-pub use anchor_spl::associated_token::{AssociatedToken};
+use anchor_spl::{
+    associated_token::AssociatedToken,
+    metadata::{MetadataAccount, MasterEditionAccount},
+    token_interface::{Mint,TokenAccount, TokenInterface}
+};
 
 pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64) -> Result<()> {
     ctx.accounts.token_lottery.bump = ctx.bumps.token_lottery;
@@ -8,6 +11,8 @@ pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64) -> Result<()> 
     ctx.accounts.token_lottery.pot = ctx.accounts.lottery_pot_account.key();
     ctx.accounts.token_lottery.start_time = start;
     ctx.accounts.token_lottery.end_time = end;
+    ctx.accounts.token_lottery.ticket_num = 0;
+    ctx.accounts.token_lottery.amount = 0;
     
     Ok(())
 }
@@ -35,8 +40,9 @@ pub struct Initialize<'info> {
         token::authority = lottery_pot_account
     )]
     pub lottery_pot_account: InterfaceAccount<'info, TokenAccount>,
+    
     pub mint: InterfaceAccount<'info,Mint>,
-    // 
+
     #[account(
         init,
         payer = signer,
@@ -45,11 +51,13 @@ pub struct Initialize<'info> {
     )]
     pub collection_mint: InterfaceAccount<'info,Mint>,
 
+    // Since this is initialized by metaplex program
     #[account(mut)]
-    pub metadata: Account<'info, MetadataAccount>,
+    pub metadata: UncheckedAccount<'info>,
 
+    // Since this is initialized by metaplex program
     #[account(mut)]
-    pub master_edition: Account<'info, MasterEditionAccount>,
+    pub master_edition: UncheckedAccount<'info>,
 
     #[account(
         init_if_needed,
@@ -58,8 +66,6 @@ pub struct Initialize<'info> {
         associated_token::authority = collection_token_account
     )]
     pub collection_token_account: InterfaceAccount<'info, TokenAccount>,
-
-
     pub token_program: Interface<'info,TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info,System>
@@ -75,4 +81,6 @@ pub struct TokenLottery{
     pub end_time: u64,
     pub pot: Pubkey,
     pub mint: Pubkey,
+    pub ticket_num: u64,
+    pub amount: u64,
 }
