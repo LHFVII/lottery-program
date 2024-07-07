@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    metadata::{MetadataAccount, MasterEditionAccount},
     token_interface::{Mint,TokenAccount, TokenInterface}
 };
 
@@ -51,11 +50,11 @@ pub struct Initialize<'info> {
     )]
     pub collection_mint: InterfaceAccount<'info,Mint>,
 
-    // Since this is initialized by metaplex program
+    /// CHECK: This account will be initialized by the metaplex program
     #[account(mut)]
     pub metadata: UncheckedAccount<'info>,
 
-    // Since this is initialized by metaplex program
+    /// CHECK: This account will be initialized by the metaplex program
     #[account(mut)]
     pub master_edition: UncheckedAccount<'info>,
 
@@ -66,8 +65,9 @@ pub struct Initialize<'info> {
         associated_token::authority = collection_token_account
     )]
     pub collection_token_account: InterfaceAccount<'info, TokenAccount>,
-    pub token_program: Interface<'info,TokenInterface>,
+    
     pub associated_token_program: Program<'info, AssociatedToken>,
+    pub token_program: Interface<'info,TokenInterface>,
     pub system_program: Program<'info,System>
 
 }
