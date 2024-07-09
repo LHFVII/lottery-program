@@ -47,6 +47,8 @@ pub struct Initialize<'info> {
         payer = signer,
         mint::decimals = 0,
         mint::authority = collection_mint,
+        seeds = [token_lottery.key().as_ref()],
+        bump,
     )]
     pub collection_mint: InterfaceAccount<'info,Mint>,
 
