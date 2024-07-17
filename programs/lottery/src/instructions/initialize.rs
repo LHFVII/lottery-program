@@ -4,14 +4,14 @@ use anchor_spl::{
     token_interface::{Mint,TokenAccount, TokenInterface}
 };
 
-pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64) -> Result<()> {
-    ctx.accounts.token_lottery.bump = ctx.bumps.token_lottery;
-    ctx.accounts.token_lottery.mint = ctx.accounts.mint.key();
-    ctx.accounts.token_lottery.pot = ctx.accounts.lottery_pot_account.key();
-    ctx.accounts.token_lottery.start_time = start;
-    ctx.accounts.token_lottery.end_time = end;
-    ctx.accounts.token_lottery.ticket_num = 0;
-    ctx.accounts.token_lottery.amount = 0;
+pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64, price: u64) -> Result<()> {
+    ctx.accounts.token_lottery_config.bump = ctx.bumps.token_lottery_config;
+    ctx.accounts.token_lottery_config.mint = ctx.accounts.mint.key();
+    ctx.accounts.token_lottery_config.start_time = start;
+    ctx.accounts.token_lottery_config.end_time = end;
+    ctx.accounts.token_lottery_config.ticket_num = 0;
+    ctx.accounts.token_lottery_config.amount = 0;
+    ctx.accounts.token_lottery_config.price = price;
     
     Ok(())
 }
@@ -25,20 +25,10 @@ pub struct Initialize<'info> {
         init,
         payer = signer,
         space = 8 + TokenLottery::INIT_SPACE,
-        seeds =[b"token_lottery".as_ref()],
+        seeds =[b"token_lottery_config".as_ref()],
         bump
     )]
-    pub token_lottery: Account<'info, TokenLottery>,
-    
-    #[account(
-        init,
-        payer = signer,
-        seeds =[b"token_lottery".as_ref()],
-        bump,
-        token::mint = mint,
-        token::authority = lottery_pot_account
-    )]
-    pub lottery_pot_account: InterfaceAccount<'info, TokenAccount>,
+    pub token_lottery_config: Account<'info, TokenLottery>,
     
     pub mint: InterfaceAccount<'info,Mint>,
 
@@ -47,7 +37,7 @@ pub struct Initialize<'info> {
         payer = signer,
         mint::decimals = 0,
         mint::authority = collection_mint,
-        seeds = [token_lottery.key().as_ref()],
+        seeds = [token_lottery_config.key().as_ref()],
         bump,
     )]
     pub collection_mint: InterfaceAccount<'info,Mint>,
@@ -81,8 +71,9 @@ pub struct TokenLottery{
     pub winner:u32,
     pub start_time: u64,
     pub end_time: u64,
-    pub pot: Pubkey,
+    pub lottery_pot_amount: u64,
     pub mint: Pubkey,
     pub ticket_num: u64,
     pub amount: u64,
+    pub price: u64,
 }

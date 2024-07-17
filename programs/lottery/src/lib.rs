@@ -11,11 +11,11 @@ declare_id!("GybA6juy56pVEdv9W8aqEyDGec5wkWf5ZLAed5GfEEtW");
 pub mod lottery {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64) -> Result<()> {
-        instructions::initialize(ctx, start, end)
+    pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64, price:u64) -> Result<()> {
+        instructions::initialize(ctx, start, end, price)
     }
 
-    pub fn buy_ticket(ctx: Context<BuyTicket>, amount: u64) -> Result<()> {
-        instructions::buy_ticket(ctx, amount)
+    pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
+        instructions::buy_ticket(ctx)
     }
 }

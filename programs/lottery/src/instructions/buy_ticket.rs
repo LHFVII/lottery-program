@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-
+use anchor_lang::system_program;
 use anchor_spl::{
     associated_token::AssociatedToken,
     metadata::{Metadata,create_master_edition_v3, create_metadata_accounts_v3,CreateMetadataAccountsV3,CreateMasterEditionV3},
@@ -23,14 +23,10 @@ pub const uri: &str = "Token Lottery";
 #[constant]
 pub const symbol: &str = "TICKET";
 
-pub fn buy_ticket(ctx: Context<BuyTicket>, amount: u64) -> Result<()> {
-    let lottery = &mut ctx.accounts.token_lottery;
-    let pot = &mut ctx.accounts.lottery_pot;
-
+pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
     let metadata = &ctx.accounts.metadata.to_account_info();
     let master_edition = &ctx.accounts.master_edition.to_account_info();
     let mint = &ctx.accounts.mint.to_account_info();
-    let payer = &mut ctx.accounts.payer.to_account_info();
     let system_program = &ctx.accounts.system_program.to_account_info();
     let spl_token_program = &ctx.accounts.token_program.to_account_info();
     let spl_metadata_program = &ctx.accounts.token_metadata_program.to_account_info();
@@ -39,71 +35,17 @@ pub fn buy_ticket(ctx: Context<BuyTicket>, amount: u64) -> Result<()> {
     let signer_seeds: &[&[&[u8]]] = &[&[
         &[ctx.bumps.collection_mint],
     ]];
-
-    mint_to(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            MintTo {
-                mint: ctx.accounts.mint.to_account_info(),
-                to: ctx.accounts.destination.to_account_info(),
-                authority: ctx.accounts.collection_mint.to_account_info(),
+    system_program::transfer(
+        CpiContext::new(
+            ctx.accounts.system_program.to_account_info(),
+            system_program::Transfer{
+                from: ctx.accounts.payer.to_account_info(),
+                to: ctx.accounts.token_lottery.to_account_info(),
             },
-            signer_seeds,
         ),
-        1,
-    )?;
-
-    // create metadata account for nft in collection
-    create_metadata_accounts_v3(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_metadata_program.to_account_info(),
-            CreateMetadataAccountsV3 {
-                metadata: ctx.accounts.metadata.to_account_info(),
-                mint: ctx.accounts.mint.to_account_info(),
-                mint_authority: ctx.accounts.collection_mint.to_account_info(),
-                update_authority: ctx.accounts.collection_mint.to_account_info(),
-                payer: ctx.accounts.payer.to_account_info(),
-                system_program: ctx.accounts.system_program.to_account_info(),
-                rent: ctx.accounts.rent.to_account_info(),
-            },
-            &signer_seeds,
-        ),
-        DataV2 {
-            name: String::from(name),
-            symbol: String::from(symbol),
-            uri: String::from(uri),
-            seller_fee_basis_points: 0,
-            creators: None,
-            collection: None,
-            uses: None,
-        },
-        true,
-        true,
-        None,
+        ctx.accounts.token_lottery.price
     )?;
     
-    // create master edition account for nft in collection
-    create_master_edition_v3(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_metadata_program.to_account_info(),
-            CreateMasterEditionV3 {
-                payer: ctx.accounts.payer.to_account_info(),
-                mint: ctx.accounts.mint.to_account_info(),
-                edition: ctx.accounts.master_edition.to_account_info(),
-                mint_authority: ctx.accounts.collection_mint.to_account_info(),
-                update_authority: ctx.accounts.collection_mint.to_account_info(),
-                metadata: ctx.accounts.metadata.to_account_info(),
-                token_program: ctx.accounts.token_program.to_account_info(),
-                system_program: ctx.accounts.system_program.to_account_info(),
-                rent: ctx.accounts.rent.to_account_info(),
-            },
-            &signer_seeds,
-        ),
-        Some(0),
-    )?;
-
-    
-
     Ok(())
 }
 
@@ -114,9 +56,6 @@ pub struct BuyTicket<'info> {
 
     #[account(mut)]
     pub token_lottery: Account<'info,TokenLottery>,
-
-    #[account(mut)]
-    pub lottery_pot: InterfaceAccount<'info,TokenAccount>,
 
     #[account(
         init,
