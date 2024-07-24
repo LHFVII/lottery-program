@@ -70,12 +70,12 @@ pub struct Initialize<'info> {
 #[derive(InitSpace)]
 pub struct TokenLottery{
     pub bump:u8,
-    pub winner:u32,
+    pub winner:u8,
     pub start_time: u64,
     pub end_time: u64,
     pub lottery_pot_amount: u64,
     pub mint: Pubkey,
-    pub ticket_num: u64,
+    pub ticket_num: u8,
     pub amount: u64,
     pub price: u64,
     pub randomness_account: Pubkey,
