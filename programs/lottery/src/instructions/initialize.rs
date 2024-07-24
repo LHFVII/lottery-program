@@ -6,7 +6,7 @@ use anchor_spl::{
 
 pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64, price: u64) -> Result<()> {
     ctx.accounts.token_lottery_config.bump = ctx.bumps.token_lottery_config;
-    ctx.accounts.token_lottery_config.mint = ctx.accounts.mint.key();
+    //ctx.accounts.token_lottery_config.mint = ctx.accounts.mint.key();
     ctx.accounts.token_lottery_config.start_time = start;
     ctx.accounts.token_lottery_config.end_time = end;
     ctx.accounts.token_lottery_config.ticket_num = 0;
@@ -14,7 +14,6 @@ pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64, price: u64) ->
     ctx.accounts.token_lottery_config.price = price;
     ctx.accounts.token_lottery_config.randomness_account = Pubkey::default();
     ctx.accounts.token_lottery_config.authority = ctx.accounts.signer.key();
-    
     Ok(())
 }
 
@@ -34,7 +33,7 @@ pub struct Initialize<'info> {
     
     pub mint: InterfaceAccount<'info,Mint>,
 
-    #[account(
+    /*#[account(
         init,
         payer = signer,
         mint::decimals = 0,
@@ -58,7 +57,7 @@ pub struct Initialize<'info> {
         associated_token::mint = collection_mint,
         associated_token::authority = collection_token_account
     )]
-    pub collection_token_account: InterfaceAccount<'info, TokenAccount>,
+    pub collection_token_account: InterfaceAccount<'info, TokenAccount>,*/
     
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info,TokenInterface>,
