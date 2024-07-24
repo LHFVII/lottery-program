@@ -1,11 +1,11 @@
 use anchor_lang::prelude::*;
 
-pub fn choose_winner(ctx: Context<ChooseWinner>) -> Result<()> {
-    Ok(())
+pub fn commit_winner(ctx: Context<ChooseWinner>) -> Result<()>{
+    
 }
 
 #[derive(Accounts)]
-pub struct ChooseWinner<'info>{
+pub struct CommitWinner<'info>{
     #[account(mut)]
     pub payer: Signer<'info>,
 
