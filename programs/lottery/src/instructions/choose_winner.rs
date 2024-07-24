@@ -9,11 +9,23 @@ pub fn choose_winner(ctx: Context<ChooseWinner>) -> Result<()> {
     let clock = Clock::get()?;
     let token_lottery = &mut ctx.accounts.token_lottery;
 
+    require!(
+        ctx.accounts.payer.key() == token_lottery.authority,
+        LotteryProgramError::NotAuthorized);
+    
+    require!(
+        ctx.accounts.randomness_account_data.key() == token_lottery.randomness_account,
+        LotteryProgramError::IncorrectRandomnessAccount
+    );
+
+    require!(clock.slot >= token_lottery.end_time,
+        LotteryProgramError::LotteryNotEndedYet);
+
     let randomness_data = RandomnessAccountData::parse(ctx.accounts.randomness_account_data.data.borrow()).unwrap();
     let revealed_random_value = randomness_data.get_value(&clock)
         .map_err(|_| LotteryProgramError::RandomnessNotResolved)?;
     
-    let randomness_result = revealed_random_value[0] % token_lottery.ticket_num;
+    let randomness_result = revealed_random_value[0] as u32 % token_lottery.ticket_num;
 
     token_lottery.winner = randomness_result;
 
@@ -22,7 +34,7 @@ pub fn choose_winner(ctx: Context<ChooseWinner>) -> Result<()> {
 
 #[derive(Accounts)]
 pub struct ChooseWinner<'info>{
-    pub user: Signer<'info>,
+    pub payer: Signer<'info>,
     
     #[account(mut)]
     pub token_lottery: Account<'info, TokenLottery>,

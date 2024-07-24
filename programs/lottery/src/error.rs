@@ -14,4 +14,10 @@ pub enum LotteryProgramError {
 
     #[msg("Randomness is not resolved!")]
     RandomnessNotResolved,
+
+    #[msg("Signer is not authorized to execute the instruction")]
+    NotAuthorized,
+
+    #[msg("Wrong randomness account")]
+    IncorrectRandomnessAccount,
 }

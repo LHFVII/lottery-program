@@ -15,7 +15,7 @@ pub fn commit_winner(ctx: Context<CommitWinner>, randomness_account: Pubkey) -> 
         LotteryProgramError::RandomnessAlreadyRevealed
     );
     
-    token_lottery.randomness_account = randomness_account;
+    token_lottery.randomness_account = ctx.accounts.randomness_account_data.key();
 
     Ok(())
     
@@ -23,7 +23,7 @@ pub fn commit_winner(ctx: Context<CommitWinner>, randomness_account: Pubkey) -> 
 
 #[derive(Accounts)]
 pub struct CommitWinner<'info>{
-    pub user: Signer<'info>,
+    pub payer: Signer<'info>,
     
     #[account(mut)]
     pub token_lottery: Account<'info, TokenLottery>,
