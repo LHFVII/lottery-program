@@ -7,14 +7,15 @@ use crate::error::{LotteryProgramError};
 
 pub fn commit_winner(ctx: Context<CommitWinner>, randomness_account: Pubkey) -> Result<()>{
     let clock = Clock::get()?;
-    require!(clock.slot >= ctx.accounts.token_lottery.end_time,
+    let token_lottery = &mut ctx.accounts.token_lottery;
+    require!(clock.slot >= token_lottery.end_time,
         LotteryProgramError::LotteryNotEndedYet);
     let randomness_data = RandomnessAccountData::parse(ctx.accounts.randomness_account_data.data.borrow()).unwrap();
     require!(randomness_data.seed_slot < clock.slot -1,
         LotteryProgramError::RandomnessAlreadyRevealed
     );
     
-    ctx.accounts.token_lottery.randomness_account = randomness_account;
+    token_lottery.randomness_account = randomness_account;
 
     Ok(())
     

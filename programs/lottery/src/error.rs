@@ -11,4 +11,7 @@ pub enum LotteryProgramError {
 
     #[msg("Randomness has already been revealed!")]
     RandomnessAlreadyRevealed,
+
+    #[msg("Randomness is not resolved!")]
+    RandomnessNotResolved,
 }
