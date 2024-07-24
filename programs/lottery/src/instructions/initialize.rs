@@ -66,7 +66,7 @@ pub struct Initialize<'info> {
 
 #[account]
 #[derive(InitSpace)]
-pub struct TokenLottery{
+pub struct TokenLottery<'info>{
     pub bump:u8,
     pub winner:u32,
     pub start_time: u64,
@@ -76,4 +76,5 @@ pub struct TokenLottery{
     pub ticket_num: u64,
     pub amount: u64,
     pub price: u64,
+    pub randomness_account: UncheckedAccount<'info>
 }

@@ -17,6 +17,8 @@ use anchor_spl::metadata::mpl_token_metadata::{
     }
 };
 
+use crate::error::{LotteryProgramError};
+
 #[constant]
 pub const NAME: &str = "Token Lottery Ticket";
 
@@ -29,6 +31,9 @@ pub const SYMBOL: &str = "TICKET";
 use crate::TokenLottery;
 
 pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
+    let clock = Clock::get()?;
+    require!(clock.slot > ctx.accounts.token_lottery.start_time && clock.slot < ctx.accounts.token_lottery.end_time, 
+        LotteryProgramError::LotteryEnded);
     system_program::transfer(
         CpiContext::new(
             ctx.accounts.system_program.to_account_info(),
