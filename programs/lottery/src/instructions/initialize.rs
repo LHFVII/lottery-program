@@ -12,6 +12,8 @@ pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64, price: u64) ->
     ctx.accounts.token_lottery_config.ticket_num = 0;
     ctx.accounts.token_lottery_config.amount = 0;
     ctx.accounts.token_lottery_config.price = price;
+    ctx.accounts.token_lottery_config.randomness_account = Pubkey::default();
+    ctx.accounts.token_lottery_config.authority = ctx.accounts.signer.key();
     
     Ok(())
 }
@@ -66,7 +68,7 @@ pub struct Initialize<'info> {
 
 #[account]
 #[derive(InitSpace)]
-pub struct TokenLottery<'info>{
+pub struct TokenLottery{
     pub bump:u8,
     pub winner:u32,
     pub start_time: u64,
@@ -76,5 +78,6 @@ pub struct TokenLottery<'info>{
     pub ticket_num: u64,
     pub amount: u64,
     pub price: u64,
-    pub randomness_account: UncheckedAccount<'info>
+    pub randomness_account: Pubkey,
+    pub authority: Pubkey
 }

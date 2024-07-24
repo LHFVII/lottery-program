@@ -1,17 +1,22 @@
 use anchor_lang::prelude::*;
 use switchboard_on_demand::accounts::RandomnessAccountData;
 
+use crate::instructions::initialize::TokenLottery;
+
 use crate::error::{LotteryProgramError};
 
-pub fn commit_winner(ctx: Context<ChooseWinner>) -> Result<()>{
+pub fn commit_winner(ctx: Context<CommitWinner>, randomness_account: Pubkey) -> Result<()>{
     let clock = Clock::get()?;
     require!(clock.slot >= ctx.accounts.token_lottery.end_time,
-        LotteryProgramError::LotteryNotEndedYet)
-    let randomness_data = RandomnessAccountData::parse(ctx.accounts.randomness_account_data.data.borrow().unwrap());
+        LotteryProgramError::LotteryNotEndedYet);
+    let randomness_data = RandomnessAccountData::parse(ctx.accounts.randomness_account_data.data.borrow()).unwrap();
     require!(randomness_data.seed_slot < clock.slot -1,
         LotteryProgramError::RandomnessAlreadyRevealed
-    )
+    );
     
+    ctx.accounts.token_lottery.randomness_account = randomness_account;
+
+    Ok(())
     
 }
 
@@ -22,7 +27,8 @@ pub struct CommitWinner<'info>{
     #[account(mut)]
     pub token_lottery: Account<'info, TokenLottery>,
 
-    pub randomness_account_data: UncheckedAccount<'info>
+    /// CHECK: The account's data is validated manually by the handler.
+    pub randomness_account_data: UncheckedAccount<'info>,
 
     pub system_program: Program<'info, System>
 }

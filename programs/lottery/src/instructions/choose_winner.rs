@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 
 pub fn choose_winner(ctx: Context<ChooseWinner>) -> Result<()> {
+    let clock = Clock::get()?;
     Ok(())
 }
 
