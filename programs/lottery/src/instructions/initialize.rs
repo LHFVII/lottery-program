@@ -6,7 +6,7 @@ use anchor_spl::{
 
 pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64, price: u64) -> Result<()> {
     ctx.accounts.token_lottery_config.bump = ctx.bumps.token_lottery_config;
-    //ctx.accounts.token_lottery_config.mint = ctx.accounts.mint.key();
+    ctx.accounts.token_lottery_config.mint = ctx.accounts.mint.key();
     ctx.accounts.token_lottery_config.start_time = start;
     ctx.accounts.token_lottery_config.end_time = end;
     ctx.accounts.token_lottery_config.ticket_num = 0;
@@ -33,7 +33,7 @@ pub struct Initialize<'info> {
     
     pub mint: InterfaceAccount<'info,Mint>,
 
-    /*#[account(
+    #[account(
         init,
         payer = signer,
         mint::decimals = 0,
@@ -42,14 +42,14 @@ pub struct Initialize<'info> {
         bump,
     )]
     pub collection_mint: InterfaceAccount<'info,Mint>,
-
-    /// CHECK: This account will be initialized by the metaplex program
+    
+    /*/// CHECK: This account will be initialized by the metaplex program
     #[account(mut)]
     pub metadata: UncheckedAccount<'info>,
-
-    /// CHECK: This account will be initialized by the metaplex program
+    
+    /*/// CHECK: This account will be initialized by the metaplex program
     #[account(mut)]
-    pub master_edition: UncheckedAccount<'info>,
+    pub master_edition: UncheckedAccount<'info>,*/
 
     #[account(
         init_if_needed,
