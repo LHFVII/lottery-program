@@ -1,6 +1,8 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
-    associated_token::AssociatedToken, metadata::Metadata, token_interface::{Mint, TokenAccount, TokenInterface}
+    associated_token::AssociatedToken,
+    metadata::Metadata,
+    token_interface::{Mint, TokenAccount, TokenInterface},
 };
 
 pub fn initialize_lottery(ctx: Context<InitializeLottery>) -> Result<()> {
@@ -55,7 +57,6 @@ struct InitializeLottery<'info> {
     )]
     /// CHECK: This account is checked by the metadata program
     pub master_edition: UncheckedAccount<'info>,
-
 
     pub token_metadata_program: Program<'info, Metadata>,
     pub token_program: Interface<'info, TokenInterface>,
