@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 
 #[error_code]
 pub enum LotteryProgramError {
-    
     #[msg("Lottery is already finished")]
     LotteryEnded,
 

@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token_interface::{Mint,TokenAccount, TokenInterface}
+    token_interface::{Mint, TokenAccount, TokenInterface},
 };
 
 pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64, price: u64) -> Result<()> {
@@ -10,7 +10,6 @@ pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64, price: u64) ->
     ctx.accounts.token_lottery_config.start_time = start;
     ctx.accounts.token_lottery_config.end_time = end;
     ctx.accounts.token_lottery_config.ticket_num = 0;
-    ctx.accounts.token_lottery_config.amount = 0;
     ctx.accounts.token_lottery_config.price = price;
     ctx.accounts.token_lottery_config.randomness_account = Pubkey::default();
     ctx.accounts.token_lottery_config.authority = ctx.accounts.signer.key();
@@ -30,8 +29,8 @@ pub struct Initialize<'info> {
         bump
     )]
     pub token_lottery_config: Account<'info, TokenLottery>,
-    
-    pub mint: InterfaceAccount<'info,Mint>,
+
+    pub mint: InterfaceAccount<'info, Mint>,
 
     #[account(
         init,
@@ -41,12 +40,12 @@ pub struct Initialize<'info> {
         seeds = [token_lottery_config.key().as_ref()],
         bump,
     )]
-    pub collection_mint: InterfaceAccount<'info,Mint>,
-    
+    pub collection_mint: InterfaceAccount<'info, Mint>,
+
     /*/// CHECK: This account will be initialized by the metaplex program
     #[account(mut)]
     pub metadata: UncheckedAccount<'info>,
-    
+
     /*/// CHECK: This account will be initialized by the metaplex program
     #[account(mut)]
     pub master_edition: UncheckedAccount<'info>,*/
@@ -58,25 +57,23 @@ pub struct Initialize<'info> {
         associated_token::authority = collection_token_account
     )]
     pub collection_token_account: InterfaceAccount<'info, TokenAccount>,*/
-    
     pub associated_token_program: Program<'info, AssociatedToken>,
-    pub token_program: Interface<'info,TokenInterface>,
-    pub system_program: Program<'info,System>
-
+    pub token_program: Interface<'info, TokenInterface>,
+    pub system_program: Program<'info, System>,
 }
 
 #[account]
 #[derive(InitSpace)]
-pub struct TokenLottery{
-    pub bump:u8,
-    pub winner:u32,
+pub struct TokenLottery {
+    pub bump: u8,
+    pub winner: u64,
+    pub winner_claimed: bool,
     pub start_time: u64,
     pub end_time: u64,
     pub lottery_pot_amount: u64,
     pub mint: Pubkey,
     pub ticket_num: u32,
-    pub amount: u64,
     pub price: u64,
+    pub authority: Pubkey,
     pub randomness_account: Pubkey,
-    pub authority: Pubkey
 }

@@ -3,21 +3,16 @@ use anchor_lang::system_program;
 use anchor_spl::{
     associated_token::AssociatedToken,
     metadata::{
-        create_metadata_accounts_v3,CreateMetadataAccountsV3,
-        Metadata,
-        SetAndVerifySizedCollectionItem,set_and_verify_sized_collection_item,
+        create_metadata_accounts_v3, set_and_verify_sized_collection_item,
+        CreateMetadataAccountsV3, Metadata, SetAndVerifySizedCollectionItem,
     },
-    token_interface::{mint_to,Mint,MintTo,TokenInterface,TokenAccount},
+    token_interface::{mint_to, Mint, MintTo, TokenAccount, TokenInterface},
 };
-use mpl_token_metadata::accounts::{ MasterEdition };
+use mpl_token_metadata::accounts::MasterEdition;
 
-use anchor_spl::metadata::mpl_token_metadata::{
-    types::{
-        DataV2,
-    }
-};
+use anchor_spl::metadata::mpl_token_metadata::types::DataV2;
 
-use crate::error::{LotteryProgramError};
+use crate::error::LotteryProgramError;
 
 #[constant]
 pub const NAME: &str = "Token Lottery Ticket";
@@ -32,28 +27,29 @@ use crate::TokenLottery;
 
 pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
     let clock = Clock::get()?;
-    require!(clock.slot > ctx.accounts.token_lottery.start_time && clock.slot < ctx.accounts.token_lottery.end_time, 
-        LotteryProgramError::LotteryEnded);
+    require!(
+        clock.slot > ctx.accounts.token_lottery.start_time
+            && clock.slot < ctx.accounts.token_lottery.end_time,
+        LotteryProgramError::LotteryEnded
+    );
     system_program::transfer(
         CpiContext::new(
             ctx.accounts.system_program.to_account_info(),
-            system_program::Transfer{
+            system_program::Transfer {
                 from: ctx.accounts.payer.to_account_info(),
                 to: ctx.accounts.token_lottery.to_account_info(),
             },
         ),
-        ctx.accounts.token_lottery.price
+        ctx.accounts.token_lottery.price,
     )?;
 
-    // if you don't cast it, you fail 
-    let signer_seeds: &[&[&[u8]]] = &[&[
-        &[ctx.bumps.collection_mint],
-    ]];
+    // if you don't cast it, you fail
+    let signer_seeds: &[&[&[u8]]] = &[&[&[ctx.bumps.collection_mint]]];
 
     mint_to(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
-            MintTo{
+            MintTo {
                 mint: ctx.accounts.ticket_mint.to_account_info(),
                 to: ctx.accounts.destination.to_account_info(),
                 authority: ctx.accounts.collection_mint.to_account_info(),
@@ -104,17 +100,13 @@ pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
                 update_authority: ctx.accounts.collection_mint.to_account_info(),
                 collection_mint: ctx.accounts.collection_mint.to_account_info(),
                 collection_metadata: ctx.accounts.collection_metadata_account.to_account_info(),
-                collection_master_edition: ctx
-                    .accounts
-                    .collection_master_edition
-                    .to_account_info(),
+                collection_master_edition: ctx.accounts.collection_master_edition.to_account_info(),
             },
             &signer_seeds,
         ),
         None,
     )?;
 
-    
     Ok(())
 }
 
@@ -124,7 +116,7 @@ pub struct BuyTicket<'info> {
     pub payer: Signer<'info>,
 
     #[account(mut)]
-    pub token_lottery: Account<'info,TokenLottery>,
+    pub token_lottery: Account<'info, TokenLottery>,
 
     #[account(
         init,
@@ -150,7 +142,7 @@ pub struct BuyTicket<'info> {
     #[account(mut)]
     /// CHECK: This account will be initialized by the metaplex program
     pub master_edition: UncheckedAccount<'info>,
-    
+
     #[account(
         mut,
         seeds = [token_lottery.key().as_ref()],
@@ -158,25 +150,23 @@ pub struct BuyTicket<'info> {
     )]
     pub collection_mint: InterfaceAccount<'info, Mint>,
 
-    
-
-     /// CHECK:
-     #[account(
+    /// CHECK:
+    #[account(
         mut,
         address=MasterEdition::find_pda(&collection_mint.key()).0
     )]
-    pub collection_metadata_account: UncheckedAccount<'info>, 
+    pub collection_metadata_account: UncheckedAccount<'info>,
 
-     /// CHECK:
-     #[account(
+    /// CHECK:
+    #[account(
         mut,
         address=MasterEdition::find_pda(&collection_mint.key()).0
     )]
     pub collection_master_edition: UncheckedAccount<'info>,
 
     pub associated_token_program: Program<'info, AssociatedToken>,
-    pub token_program: Interface<'info,TokenInterface>,
-    pub system_program: Program<'info,System>,
+    pub token_program: Interface<'info, TokenInterface>,
+    pub system_program: Program<'info, System>,
     pub token_metadata_program: Program<'info, Metadata>,
     pub rent: Sysvar<'info, Rent>,
 }
