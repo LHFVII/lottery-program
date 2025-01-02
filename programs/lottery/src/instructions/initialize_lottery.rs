@@ -17,7 +17,7 @@ pub const symbol: &str = "TLT";
 #[constant]
 pub const uri: &str = "https://www.freepik.es/fotos-vectores-gratis/ticket-shapes/7";
 
-pub fn initialize_lottery(ctx: Context<InitializeLottery>) -> Result<(),anchor_lang::error::Error> {
+pub fn initialize_lottery(ctx: Context<InitializeLottery>) -> Result<(())> {
     let signer_seeds: &[&[&[u8]]] = &[&[b"collection_mint".as_ref(), &[ctx.bumps.collection_mint]]];
 
     mint_to(
