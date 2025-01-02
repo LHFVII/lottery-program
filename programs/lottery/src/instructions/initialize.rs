@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token_interface::{Mint, TokenAccount, TokenInterface},
+    token_interface::{Mint, TokenInterface},
 };
 
 pub fn initialize(ctx: Context<Initialize>, start: u64, end: u64, price: u64) -> Result<()> {
@@ -41,22 +41,6 @@ pub struct Initialize<'info> {
         bump,
     )]
     pub collection_mint: InterfaceAccount<'info, Mint>,
-
-    /*/// CHECK: This account will be initialized by the metaplex program
-    #[account(mut)]
-    pub metadata: UncheckedAccount<'info>,
-
-    /*/// CHECK: This account will be initialized by the metaplex program
-    #[account(mut)]
-    pub master_edition: UncheckedAccount<'info>,*/
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = collection_mint,
-        associated_token::authority = collection_token_account
-    )]
-    pub collection_token_account: InterfaceAccount<'info, TokenAccount>,*/
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,

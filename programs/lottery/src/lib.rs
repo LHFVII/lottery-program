@@ -15,6 +15,10 @@ pub mod lottery {
         instructions::initialize(ctx, start, end, price)
     }
 
+    pub fn initialize_lottery(ctx: Context<InitializeLottery>) -> Result<()> {
+        return instructions::initialize_lottery(ctx);
+    }
+
     pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
         instructions::buy_ticket(ctx)
     }
