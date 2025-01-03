@@ -5,9 +5,13 @@ use crate::instructions::initialize::TokenLottery;
 
 use crate::error::LotteryProgramError;
 
-pub fn commit_winner(ctx: Context<CommitWinner>, randomness_account: Pubkey) -> Result<()> {
+pub fn commit_winner(ctx: Context<CommitWinner>) -> Result<()> {
     let clock = Clock::get()?;
     let token_lottery = &mut ctx.accounts.token_lottery;
+    require!(
+        ctx.accounts.payer.key() == token_lottery.authority,
+        LotteryProgramError::NotAuthorized
+    );
     require!(
         clock.slot >= token_lottery.end_time,
         LotteryProgramError::LotteryNotEndedYet
@@ -33,6 +37,5 @@ pub struct CommitWinner<'info> {
 
     /// CHECK: The account's data is validated manually by the handler.
     pub randomness_account_data: UncheckedAccount<'info>,
-
     pub system_program: Program<'info, System>,
 }
