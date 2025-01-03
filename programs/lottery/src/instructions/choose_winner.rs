@@ -10,6 +10,11 @@ pub fn choose_winner(ctx: Context<ChooseWinner>) -> Result<()> {
     let token_lottery = &mut ctx.accounts.token_lottery;
 
     require!(
+        !token_lottery.winner_claimed,
+        LotteryProgramError::WinnerAlreadyChosen
+    );
+
+    require!(
         ctx.accounts.payer.key() == token_lottery.authority,
         LotteryProgramError::NotAuthorized
     );
@@ -33,7 +38,7 @@ pub fn choose_winner(ctx: Context<ChooseWinner>) -> Result<()> {
     let randomness_result = revealed_random_value[0] as u32 % token_lottery.ticket_num;
 
     token_lottery.winner = randomness_result;
-
+    token_lottery.winner_claimed = true;
     Ok(())
 }
 

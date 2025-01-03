@@ -19,4 +19,7 @@ pub enum LotteryProgramError {
 
     #[msg("Wrong randomness account")]
     IncorrectRandomnessAccount,
+
+    #[msg("Winner has already been chosen")]
+    WinnerAlreadyChosen,
 }

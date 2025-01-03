@@ -11,11 +11,11 @@ use anchor_spl::{
 use mpl_token_metadata::types::{Creator, DataV2};
 
 #[constant]
-pub const name: &str = "Token Lottery number #";
+pub const NAME: &str = "Token Lottery number #";
 #[constant]
-pub const symbol: &str = "TLT";
+pub const SYMBOL: &str = "TLT";
 #[constant]
-pub const uri: &str = "https://www.freepik.es/fotos-vectores-gratis/ticket-shapes/7";
+pub const URI: &str = "https://www.freepik.es/fotos-vectores-gratis/ticket-shapes/7";
 
 pub fn initialize_lottery(ctx: Context<InitializeLottery>) -> Result<(())> {
     let signer_seeds: &[&[&[u8]]] = &[&[b"collection_mint".as_ref(), &[ctx.bumps.collection_mint]]];
@@ -48,9 +48,9 @@ pub fn initialize_lottery(ctx: Context<InitializeLottery>) -> Result<(())> {
             &signer_seeds,
         ),
         DataV2 {
-            name: name.to_string(),
-            symbol: symbol.to_string(),
-            uri: "".to_string(),
+            name: NAME.to_string(),
+            symbol: SYMBOL.to_string(),
+            uri: URI.to_string(),
             seller_fee_basis_points: 0,
             creators: Some(vec![Creator {
                 address: ctx.accounts.collection_mint.key(),
