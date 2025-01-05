@@ -14,16 +14,10 @@ use anchor_spl::metadata::mpl_token_metadata::types::DataV2;
 
 use crate::error::LotteryProgramError;
 
-#[constant]
-pub const NAME: &str = "Token Lottery Ticket";
-
-#[constant]
-pub const URI: &str = "Token Lottery";
-
-#[constant]
-pub const SYMBOL: &str = "TICKET";
-
 use crate::TokenLottery;
+use crate::NAME;
+use crate::SYMBOL;
+use crate::URI;
 
 pub fn buy_ticket(ctx: Context<BuyTicket>) -> Result<()> {
     let clock = Clock::get()?;
